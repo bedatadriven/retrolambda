@@ -4,3 +4,24 @@
 # More can be added
 
 PACKAGE java/util/function     java8/util/function
+
+CLASS   java/util/Optional     java8/util/Optional
+CLASS   java/util/OptionalInt     java8/util/OptionalInt
+CLASS   java/util/OptionalDouble     java8/util/OptionalDouble
+CLASS   java/util/OptionalLong     java8/util/OptionalLong
+
+CLASS   java/util/DoubleSummaryStatistics java8/util/DoubleSummaryStatistics
+CLASS   java/util/IntSummaryStatistics    java8/util/IntSummaryStatistics
+CLASS   java/util/LongSummaryStatistics    java8/util/LongSummaryStatistics
+
+CLASS   java/util/Comparators  java8/util/Comparators
+CLASS   java/util/ImmutableCollections  java8/util/ImmutableCollections
+CLASS   java/util/Lists                 java8/util/Lists
+CLASS   java/util/Objects           java8/util/Objects
+CLASS   java/util/Maps              java8/util/Maps
+CLASS   java/util/Sets              java8/util/Sets
+
+CLASS   java/util/StringJoiner      java8/util/StringJoiner
+
+CLASS   java/util/SplittableRandom  java8/util/SplittableRandom
+
