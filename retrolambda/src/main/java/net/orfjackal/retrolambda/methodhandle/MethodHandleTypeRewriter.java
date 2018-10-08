@@ -7,9 +7,13 @@ package net.orfjackal.retrolambda.methodhandle;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.*;
 
+import java.util.*;
+
 public class MethodHandleTypeRewriter extends ClassRemapper {
 
     public static final String PREFIX = "java/lang/invoke/";
+
+    private Set<String> invokerDescriptors = new HashSet<>();
 
     public MethodHandleTypeRewriter(ClassVisitor cv) {
         super(Opcodes.ASM5, cv, new Remapper() {
@@ -26,7 +30,14 @@ public class MethodHandleTypeRewriter extends ClassRemapper {
     }
 
     @Override
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        super.visit(version, access, name, signature, superName, interfaces);
+
+    }
+
+    @Override
     protected MethodVisitor createMethodRemapper(MethodVisitor mv) {
+
         return new MethodRemapper(mv, remapper) {
 
             @Override
@@ -53,20 +64,21 @@ public class MethodHandleTypeRewriter extends ClassRemapper {
 
                     Type returnType = Type.getReturnType(desc);
                     Type collapsedReturnType = collapseObjects(returnType);
-                    Type argumentTypes[] = Type.getArgumentTypes(desc);
+                    Type handleArguments[] = Type.getArgumentTypes(desc);
 
-                    // Collapse all array/object types to java.lang.Object
-                    for (int i = 0; i < argumentTypes.length; i++) {
-                        argumentTypes[i] = collapseObjects(argumentTypes[i]);
+                    // Static method call: handle + arguments
+                    Type wrapperArgumentTypes[] = new Type[handleArguments.length + 1];
+
+                    wrapperArgumentTypes[0] = Type.getType("Lnet/orfjackal/retrolambda/invoke/MethodHandle;");
+                    for (int i = 0; i < handleArguments.length; i++) {
+                        wrapperArgumentTypes[i + 1] = collapseObjects(handleArguments[i]);
                     }
 
-                    if(returnType.getSort() == Type.OBJECT) {
-                        name = "invoke";
-                    } else {
-                        name = "invoke" + collapsedReturnType.getDescriptor();
-                    }
-                    super.visitMethodInsn(opcode, owner, name,
-                            Type.getMethodDescriptor(collapsedReturnType, argumentTypes), false);
+                    String invokerDescriptor = Type.getMethodDescriptor(collapsedReturnType, wrapperArgumentTypes);
+                    super.visitMethodInsn(Opcodes.INVOKESTATIC, className,
+                            invokerName(returnType), invokerDescriptor, false);
+
+                    invokerDescriptors.add(invokerDescriptor);
 
                     if(!returnType.equals(collapsedReturnType)) {
                         visitTypeInsn(Opcodes.CHECKCAST, returnType.getInternalName());
@@ -76,6 +88,75 @@ public class MethodHandleTypeRewriter extends ClassRemapper {
                 }
             }
         };
+    }
+
+    @Override
+    public void visitEnd() {
+        writeInvokerMethods();
+        super.visitEnd();
+    }
+
+    private void writeInvokerMethods() {
+        for (String signature : invokerDescriptors) {
+            writeInvokerMethod(signature);
+        }
+    }
+
+    private void writeInvokerMethod(String descriptor) {
+        Type returnType = Type.getReturnType(descriptor);
+        Type argumentTypes[] = Type.getArgumentTypes(descriptor);
+        int numHandleArguments = argumentTypes.length - 1;
+
+        int access = Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC;
+        String methodName = invokerName(returnType);
+        MethodVisitor mv = visitMethod(access, methodName, descriptor, null, null);
+        mv.visitCode();
+
+        GeneratorAdapter adapter = new GeneratorAdapter(mv, access, methodName, descriptor);
+
+        // Load method handle
+        adapter.visitVarInsn(Opcodes.ALOAD, 0);
+
+        // Create a new Object[]
+        adapter.visitLdcInsn(numHandleArguments);
+        adapter.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+
+        // Store each argument to the handle, unboxing if necessary
+        for (int i = 0; i < numHandleArguments; i++) {
+            int parameterIndex = i + 1;
+            Type parameterType = argumentTypes[parameterIndex];
+            adapter.visitInsn(Opcodes.DUP);
+            adapter.visitLdcInsn(i);
+            adapter.loadArg(parameterIndex);
+            if(isPrimitive(parameterType)) {
+                adapter.box(parameterType);
+            }
+            adapter.visitInsn(Opcodes.AASTORE);
+        }
+
+        adapter.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "net/orfjackal/retrolambda/invoke/MethodHandle",
+                "invokeWithArguments", "([Ljava/lang/Object;)Ljava/lang/Object;", false);
+
+        if(isPrimitive(returnType)) {
+            adapter.unbox(returnType);
+        }
+
+        adapter.returnValue();
+        adapter.endMethod();
+    }
+
+    private boolean isPrimitive(Type parameterType) {
+        return parameterType.getSort() != Type.OBJECT && parameterType.getSort() != Type.ARRAY;
+    }
+
+    private String invokerName(Type returnType) {
+        String name;
+        if(returnType.getSort() == Type.OBJECT || returnType.getSort() == Type.ARRAY) {
+            name = "$$invoke";
+        } else {
+            name = "$$invoke" + returnType.getDescriptor();
+        }
+        return name;
     }
 
     private Type collapseObjects(Type type) {
