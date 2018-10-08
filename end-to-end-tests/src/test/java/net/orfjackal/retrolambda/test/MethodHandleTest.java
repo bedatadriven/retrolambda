@@ -35,11 +35,30 @@ public class MethodHandleTest {
         assertThat(bound.invoke(), equalTo("42"));
     }
 
+    @Test
+    public void asSpreader() throws Throwable {
+        MethodHandle square = MethodHandles.publicLookup().unreflect(
+                MethodHandleTest.class.getMethod("squish", String.class, String.class, String.class));
+
+
+        square = square.asSpreader(String[].class, 3);
+
+        String[] array = {"a", "b", "c"};
+        String squished = (String) square.invokeExact(array);
+
+        assertThat(squished, equalTo("abc"));
+
+    }
+
     public static int square(int x) {
         return x * x;
     }
 
     private int receiver(MethodHandle methodHandle, int argument) throws Throwable {
         return (int) methodHandle.invokeExact(argument);
+    }
+
+    public static String squish(String s1, String s2, String s3) {
+        return s1 + s2 + s3;
     }
 }
