@@ -26,7 +26,7 @@ class SpreadingHandle extends MethodHandle {
         for (i = 0; i < remainingArguments; i++) {
             targetArguments[i] = arguments[i];
         }
-        Object[] array = (Object[]) targetArguments[i];
+        Object[] array = (Object[]) arguments[i];
         for (int j = 0; j < arrayLength; j++) {
             targetArguments[i++] = array[j];
         }
