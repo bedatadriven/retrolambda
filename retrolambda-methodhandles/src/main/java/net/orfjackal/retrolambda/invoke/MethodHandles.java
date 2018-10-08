@@ -4,7 +4,6 @@
 
 package net.orfjackal.retrolambda.invoke;
 
-import java.lang.invoke.*;
 import java.lang.reflect.*;
 
 public class MethodHandles {
