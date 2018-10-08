@@ -50,6 +50,12 @@
         </dependency>
 
         <dependency>
+            <groupId>net.orfjackal.retrolambda</groupId>
+            <artifactId>retrolambda-methodhandles</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>net.sourceforge.streamsupport</groupId>
             <artifactId>streamsupport</artifactId>
             <version>1.6.3</version>

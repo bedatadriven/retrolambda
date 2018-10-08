@@ -50,6 +50,10 @@ public class Retrolambda {
         Log.info("Agent enabled:    " + PreMain.isAgentLoaded());
         Log.info("javac hacks:      " + isJavacHacksEnabled);
 
+        for (String apiMapping : config.getApiMappings()) {
+            Log.info("API Mapping:      " + apiMapping);
+        }
+
         if (!Files.isDirectory(inputDir)) {
             Log.info("Nothing to do; not a directory: " + inputDir);
             return;

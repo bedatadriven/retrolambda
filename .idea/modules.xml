@@ -10,6 +10,7 @@
       <module fileurl="file://$PROJECT_DIR$/backports/java7/retrolambda-backports6.iml" filepath="$PROJECT_DIR$/backports/java7/retrolambda-backports6.iml" />
       <module fileurl="file://$PROJECT_DIR$/backports/java6/retrolambda-backports7.iml" filepath="$PROJECT_DIR$/backports/java6/retrolambda-backports7.iml" />
       <module fileurl="file://$PROJECT_DIR$/retrolambda-maven-plugin/retrolambda-maven-plugin.iml" filepath="$PROJECT_DIR$/retrolambda-maven-plugin/retrolambda-maven-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/retrolambda-methodhandles/retrolambda-methodhandles.iml" filepath="$PROJECT_DIR$/retrolambda-methodhandles/retrolambda-methodhandles.iml" />
     </modules>
   </component>
 </project>

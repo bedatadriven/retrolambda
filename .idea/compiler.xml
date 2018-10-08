@@ -15,6 +15,7 @@
         <module name="retrolambda-backports6" />
         <module name="retrolambda-backports7" />
         <module name="retrolambda-maven-plugin" />
+        <module name="retrolambda-methodhandles" />
         <module name="retrolambda-runtime (1)" />
       </profile>
     </annotationProcessing>
@@ -27,6 +28,7 @@
       <module name="retrolambda-backports6" target="1.6" />
       <module name="retrolambda-backports7" target="1.7" />
       <module name="retrolambda-maven-plugin" target="1.6" />
+      <module name="retrolambda-methodhandles" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>

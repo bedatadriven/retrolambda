@@ -7,6 +7,7 @@ package net.orfjackal.retrolambda;
 import net.orfjackal.retrolambda.api.*;
 import net.orfjackal.retrolambda.interfaces.*;
 import net.orfjackal.retrolambda.lambdas.*;
+import net.orfjackal.retrolambda.methodhandle.MethodHandleTypeRewriter;
 import net.orfjackal.retrolambda.requirenonnull.RequireNonNull;
 import net.orfjackal.retrolambda.trywithresources.SwallowSuppressedExceptions;
 import org.objectweb.asm.*;
@@ -21,6 +22,7 @@ public class Transformers {
     private final boolean defaultMethodsEnabled;
     private final ClassAnalyzer analyzer;
     private final ApiMappingSet mapping;
+    private boolean methodHandlesEnabled = true;
 
     public Transformers(int targetVersion, boolean defaultMethodsEnabled, ClassAnalyzer analyzer, ApiMappingSet mapping) {
         this.targetVersion = targetVersion;
@@ -52,10 +54,10 @@ public class Transformers {
                 next = new UpdateRelocatedMethodInvocations(next, analyzer);
                 next = new AddMethodDefaultImplementations(next, analyzer);
             }
-            next = new BackportLambdaInvocations(next, analyzer);
-            if (mapping.isEnabled()) {
-                next = new RewriteApiReferences(next, mapping);
+            if (methodHandlesEnabled) {
+                next = new MethodHandleTypeRewriter(next);
             }
+            next = new BackportLambdaInvocations(next, analyzer);
             return next;
         });
     }
@@ -66,6 +68,9 @@ public class Transformers {
         // the wrong one of them is written to disk last.
         ClassNode lambdasBackported = new ClassNode();
         ClassVisitor next = lambdasBackported;
+        if(methodHandlesEnabled) {
+            next = new MethodHandleTypeRewriter(next);
+        }
         next = new BackportLambdaInvocations(next, analyzer);
         reader.accept(next, 0);
 
@@ -123,6 +128,10 @@ public class Transformers {
                 next = new SwallowSuppressedExceptions(next);
                 next = new RemoveMethodHandlesLookupReferences(next);
                 next = new RequireNonNull(next);
+                next = new RuntimeExceptionConstructor(next);
+            }
+            if (mapping.isEnabled()) {
+                next = new RewriteApiReferences(next, mapping);
             }
             next = new FixInvokeStaticOnInterfaceMethod(next);
             next = new UpdateRenamedEnclosingMethods(next, analyzer);
