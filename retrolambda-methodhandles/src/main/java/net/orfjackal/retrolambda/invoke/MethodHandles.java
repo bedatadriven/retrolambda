@@ -6,6 +6,7 @@ package net.orfjackal.retrolambda.invoke;
 
 import java.lang.reflect.*;
 
+
 public class MethodHandles {
 
 
@@ -32,6 +33,10 @@ public class MethodHandles {
                 throw new IllegalArgumentException(method + " is static");
             }
             return new VirtualHandle(method, refc, type);
+        }
+
+        public MethodHandle findStatic(Class<?> refc, String name, MethodType type) throws NoSuchMethodException, IllegalAccessException {
+            throw new UnsupportedOperationException("TODO");
         }
     }
 
