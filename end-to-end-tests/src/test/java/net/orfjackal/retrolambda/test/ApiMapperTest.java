@@ -9,8 +9,11 @@ import org.junit.Test;
 import java.nio.charset.*;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
@@ -25,6 +28,17 @@ public class ApiMapperTest {
     @Test
     public void predicates() {
         assertThat(filter(Arrays.asList("Hello World", "Goodbye World"), x -> x.startsWith("Hello")), hasSize(1));
+    }
+
+    @Test
+    public void streams() {
+        List<String> result = Arrays.asList("Hello World", "Goodbye World")
+                .stream()
+                .map(s -> s.toUpperCase())
+                .collect(Collectors.toList());
+
+
+        assertThat(result, hasItems("HELLO WORLD", "GOODBYE WORLD"));
     }
 
     private List<String> filter(List<String> strings, Predicate<String> predicate) {

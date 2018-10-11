@@ -8,16 +8,26 @@ class Mapping {
 
     private final String owner;
     private final String name;
+    private final String desc;
 
     Mapping(String signature) {
         String[] parts = signature.split("\\.");
         this.owner = parts[0];
-        this.name = parts[1];
+
+        int descStart = parts[1].indexOf('(');
+        if(descStart == -1) {
+            this.name = parts[1];
+            this.desc = null;
+        } else {
+            this.name = parts[1].substring(0, descStart);
+            this.desc = parts[1].substring(descStart);
+        }
     }
 
     public Mapping(String owner, String name) {
         this.owner = owner;
         this.name = name;
+        this.desc = null;
     }
 
     public String getOwner() {
@@ -26,5 +36,9 @@ class Mapping {
 
     public String getName() {
         return name;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }

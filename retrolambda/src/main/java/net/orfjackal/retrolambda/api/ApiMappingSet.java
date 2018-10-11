@@ -7,6 +7,7 @@ package net.orfjackal.retrolambda.api;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.*;
+import org.objectweb.asm.commons.Method;
 
 import java.io.*;
 import java.net.URL;
@@ -45,6 +46,8 @@ public class ApiMappingSet {
      * For example, from "java/lang/Double.isFinite" to "com/google/common/primitives/Doubles.isFinite"
      */
     private Map<String, Mapping> staticMethodMappings = new HashMap<>();
+
+    private Map<String, Mapping> virtualToStaticMethodMappings = new HashMap<>();
 
     public ApiMappingSet(List<String> mappings) throws IOException {
         for (String mapping : mappings) {
@@ -131,6 +134,10 @@ public class ApiMappingSet {
                     staticMethodMappings.put(columns[1], new Mapping(columns[2]));
                     break;
 
+                case INVOKEVIRTUAL:
+                    virtualToStaticMethodMappings.put(columns[1], new Mapping(columns[2]));
+                    break;
+
                 case GETSTATIC:
                     fieldMappings.put(columns[1], new Mapping(columns[2]));
                     break;
@@ -172,6 +179,10 @@ public class ApiMappingSet {
         return mapMember(staticMethodMappings, owner, name, descriptor);
     }
 
+    public Mapping mapVirtualMethod(String owner, String name, String desc) {
+        return virtualToStaticMethodMappings.get(owner + "." + name + desc);
+    }
+
     private Mapping mapMember(Map<String, Mapping> dictionary, String owner, String name, String descriptor) {
         Mapping mapping = dictionary.get(owner + "." + name + descriptor);
         if(mapping != null) {
@@ -180,4 +191,6 @@ public class ApiMappingSet {
 
         return new Mapping(mapClass(owner), name);
     }
+
+
 }

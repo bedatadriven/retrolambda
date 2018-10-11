@@ -21,8 +21,15 @@ public class ApiMappingSetTest {
         assertThat(mappingSet.mapClass("java/util/function/Function"), equalTo("java8/util/function/Function"));
         assertThat(mappingSet.mapClass("java/util/function/Predicate"), equalTo("java8/util/function/Predicate"));
         assertThat(mappingSet.mapClass("java/util/function/subpackage/MyClass"), equalTo("java8/util/function/subpackage/MyClass"));
-
     }
 
+    @Test
+    public void mapVirtualMethod() throws IOException {
+        ApiMappingSet mappingSet = new ApiMappingSet(Collections.singletonList("streamsupport"));
 
+        Mapping method = mappingSet.mapVirtualMethod("java/util/List", "stream", "()Ljava/util/stream/Stream;");
+        assertThat(method.getOwner(), equalTo("java8/util/stream/StreamSupport"));
+        assertThat(method.getName(), equalTo("stream"));
+        assertThat(method.getDesc(), equalTo("(Ljava/util/Collection;)Ljava8/util/stream/Stream;"));
+    }
 }

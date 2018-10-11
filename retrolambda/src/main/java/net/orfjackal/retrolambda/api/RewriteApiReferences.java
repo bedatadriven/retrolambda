@@ -40,9 +40,22 @@ public class RewriteApiReferences extends ClassRemapper {
                             methodMapping.getOwner(),
                             methodMapping.getName(),
                             remapper.mapDesc(desc), itf);
-                } else {
-                    super.visitMethodInsn(opcode, owner, name, desc, itf);
+                    return;
                 }
+
+                if(opcode == Opcodes.INVOKEVIRTUAL || opcode == Opcodes.INVOKEINTERFACE) {
+
+                    Mapping methodMapping = mapping.mapVirtualMethod(owner, name, desc);
+                    if (methodMapping != null) {
+                        super.visitMethodInsn(Opcodes.INVOKESTATIC,
+                                methodMapping.getOwner(),
+                                methodMapping.getName(),
+                                methodMapping.getDesc(), false);
+                        return;
+                    }
+                }
+
+                super.visitMethodInsn(opcode, owner, name, desc, itf);
             }
         };
     }

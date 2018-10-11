@@ -4,6 +4,9 @@
 # More can be added
 
 PACKAGE java/util/function     java8/util/function
+PACKAGE java/util/stream       java8/util/stream
+
+CLASS   java/util/Spliterator   java8/util/Spliterator
 
 CLASS   java/util/Optional     java8/util/Optional
 CLASS   java/util/OptionalInt     java8/util/OptionalInt
@@ -24,4 +27,9 @@ CLASS   java/util/Sets              java8/util/Sets
 CLASS   java/util/StringJoiner      java8/util/StringJoiner
 
 CLASS   java/util/SplittableRandom  java8/util/SplittableRandom
+
+INVOKEVIRTUAL java/util/List.stream()Ljava/util/stream/Stream;                          java8/util/stream/StreamSupport.stream(Ljava/util/Collection;)Ljava8/util/stream/Stream;
+
+INVOKESTATIC  java/util/Arrays.stream([Ljava/lang/Object;)Ljava/util/stream/Stream;     java8/util/J8Arrays.stream([Ljava/lang/Object;)Ljava8/util/stream/Stream;
+INVOKESTATIC  java/util/stream/IntStream.range(II)Ljava/util/stream/IntStream;          java8/util/stream/IntStreams.range(II)Ljava8/util/stream/IntStream;
 

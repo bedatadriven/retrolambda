@@ -24,6 +24,12 @@ public enum ApiMappingType {
     /**
      * Maps a static field from one class to a new class and field name
      */
-    GETSTATIC
+    GETSTATIC,
+
+
+    /**
+     * Maps a virtual method defined on one class to a static method somewhere else
+     */
+    INVOKEVIRTUAL
 
 }
